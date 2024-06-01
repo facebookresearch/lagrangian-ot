@@ -1,0 +1,67 @@
+defaults:
+  - _self_
+  - override hydra/launcher: submitit_slurm
+
+seed: 0
+num_train_iters: 3001
+batch_size: 1024
+potential_lr: 1e-4
+
+plot_frequency: 100
+save_frequency: ${plot_frequency}
+
+metric:
+  warmup_steps: 50
+  update_frequency: 10
+  update_repeat: 1
+  lr: 5e-3
+
+# neural_net_metric, scarvelis_circle, scarvelis_xpath,
+# scarvelis_vee, scarvelis_snowgoose, _scrna2d_k
+geometry: 'scarvelis_xpath'
+data: 'scarvelis_xpath'
+
+geometry_kwargs:
+  spline_solver_kwargs:
+    num_spline_nodes: 30
+    grad_tol: 1e-5
+    init_lr: 1e-2
+    num_spline_points_eval: 20
+    max_iter: 0
+
+
+ctransform_solver:
+  _target_: manifold_ot.ctransform_solvers.CTransformLBFGS
+  gtol: 1e-5
+  max_iter: 20
+  max_linesearch_iter: 20
+  linesearch_type: "backtracking"
+
+spline:
+  init_train_iters: 1001
+  train_iters: 1001
+  update_frequency: 25
+  grad_norm_threshold: 1e-4
+  noise: 0.0
+  update_on_conjugates: True
+
+target_potential_dim_hidden: [64, 64, 64, 64]
+source_map_dim_hidden: [64, 64, 64, 64]
+
+hydra:
+  run:
+    dir: ./exp/local/${now:%Y.%m.%d}/${now:%H%M}.${geometry}
+  job:
+    chdir: True
+  sweep:
+    dir: ./exp/${now:%Y.%m.%d}/${now:%H%M}
+    subdir: ${hydra.job.num}
+  launcher:
+    max_num_timeout: 100000
+    timeout_min: 4319
+    # partition: scavenge
+    # partition: devlab
+    partition: learnlab
+    mem_gb: 32
+    cpus_per_task: 20
+    gpus_per_node: 1

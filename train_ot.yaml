@@ -1,0 +1,81 @@
+defaults:
+  - _self_
+  - override hydra/launcher: submitit_slurm
+
+seed: 0
+num_train_iters: 10001
+batch_size: 1024
+
+plot_frequency: 250
+save_frequency: ${plot_frequency}
+eval_frequency: ${plot_frequency}
+save_all_plots: False
+
+anneal_geometry_steps: 2000
+
+geometry: 'sq_euclidean_manifold'
+data: null
+geometry_kwargs:
+  spline_solver_kwargs:
+    num_spline_nodes: 30
+    grad_tol: 1e-5
+    init_lr: 1e-3
+    num_spline_points_eval: 20
+    max_iter: 0
+
+target_potential_kwargs:
+  dim_hidden: [64, 64, 64, 64]
+
+source_map_kwargs:
+  dim_hidden: [64, 64, 64, 64]
+
+target_potential_opt:
+  init_lr: 5e-5
+  alpha: 1e-4
+  grad_clip: 5.
+  # b1: 0.5
+  # b2: 0.5
+  b1: 0.9
+  b2: 0.999
+
+source_map_opt:
+  init_lr: ${target_potential_opt.init_lr}
+  alpha: ${target_potential_opt.alpha}
+  grad_clip: ${target_potential_opt.grad_clip}
+  b1: 0.9
+  b2: 0.999
+
+spline:
+  init_train_iters: 5001
+  train_iters: 5001
+  update_frequency: 25
+  grad_norm_threshold: 1e-4
+  noise: 0.0
+  update_on_conjugates: True
+  restart_frequency: null
+
+
+ctransform_solver:
+  _target_: manifold_ot.ctransform_solvers.CTransformLBFGS
+  gtol: 1e-5
+  max_iter: 20
+  max_linesearch_iter: 20
+  linesearch_type: "backtracking"
+
+hydra:
+  run:
+    dir: ./exp/local/${now:%Y.%m.%d}/${now:%H%M}
+  job:
+    chdir: True
+  sweep:
+    dir: ./exp/${now:%Y.%m.%d}/${now:%H%M}
+    subdir: ${hydra.job.num}
+  launcher:
+    max_num_timeout: 100000
+    timeout_min: 4319
+    # partition: scavenge
+    partition: learnlab
+    # partition: devlab
+    mem_gb: 32
+    cpus_per_task: 20
+    gpus_per_node: 1
