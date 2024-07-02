@@ -35,7 +35,7 @@ from ott.geometry import costs
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from manifold_ot import ctransform_solvers, models, geometries
+from lagrangian_ot import ctransform_solvers, models, geometries
 
 Train_t = Dict[Literal["train_logs", "valid_logs"], Dict[str, List[float]]]
 Callback_t = Callable

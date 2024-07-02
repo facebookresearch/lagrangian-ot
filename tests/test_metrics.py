@@ -5,7 +5,7 @@ import jax.numpy as jnp
 
 import pytest
 
-from manifold_ot import manifolds, metrics
+from lagrangian_ot import manifolds, metrics
 
 def test_circle_metric():
     A_fn = metrics.CircleMetric()

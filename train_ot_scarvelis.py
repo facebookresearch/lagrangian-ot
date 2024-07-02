@@ -21,7 +21,7 @@ from typing import Iterator
 
 import hydra
 
-from manifold_ot import models, neuraldual, metrics, geodesics, geometries, data
+from lagrangian_ot import models, neuraldual, metrics, geodesics, geometries, data
 
 import matplotlib.pyplot as plt
 plt.style.use('bmh')

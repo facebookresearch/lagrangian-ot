@@ -56,7 +56,7 @@ spline:
 
 
 ctransform_solver:
-  _target_: manifold_ot.ctransform_solvers.CTransformLBFGS
+  _target_: lagrangian_ot.ctransform_solvers.CTransformLBFGS
   gtol: 1e-5
   max_iter: 20
   max_linesearch_iter: 20

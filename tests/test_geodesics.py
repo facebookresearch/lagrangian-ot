@@ -8,7 +8,7 @@ import jax.numpy as jnp
 
 import numpy as np
 
-from manifold_ot import geodesics, manifolds, metrics, data
+from lagrangian_ot import geodesics, manifolds, metrics, data
 
 
 def test_euclidean_geodesic():

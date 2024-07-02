@@ -8,7 +8,7 @@ import jax.numpy as jnp
 
 import numpy as np
 
-from manifold_ot import manifolds, metrics, data
+from lagrangian_ot import manifolds, metrics, data
 
 
 def test_dist_derivative():

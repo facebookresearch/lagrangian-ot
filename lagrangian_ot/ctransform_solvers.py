@@ -12,7 +12,7 @@ import flax
 from jaxopt import LBFGS
 
 from ott import utils
-from manifold_ot import geometries
+from lagrangian_ot import geometries
 
 
 class CTransformResults(NamedTuple):

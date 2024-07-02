@@ -12,7 +12,7 @@ from collections import namedtuple
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 
-from manifold_ot import splines
+from lagrangian_ot import splines
 
 GPState = namedtuple("GPState", "i ddc mu dmu cost")
 SplineState = namedtuple("SplineState", "i params opt_state E grad_norm")

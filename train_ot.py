@@ -28,7 +28,7 @@ from ott.solvers.linear import sinkhorn
 
 import hydra
 
-from manifold_ot import models, neuraldual, metrics, geodesics, geometries, data, spline_amortizer
+from lagrangian_ot import models, neuraldual, metrics, geodesics, geometries, data, spline_amortizer
 
 import matplotlib.pyplot as plt
 plt.style.use('bmh')

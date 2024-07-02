@@ -26,7 +26,7 @@ import glob
 import functools
 
 import matplotlib.pyplot as plt
-from manifold_ot import geometries, metrics, splines, lagrangian_potentials
+from lagrangian_ot import geometries, metrics, splines, lagrangian_potentials
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 PLOT_DIR = SCRIPT_DIR + '/plots/geodesics'

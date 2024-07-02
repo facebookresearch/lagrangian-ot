@@ -2,11 +2,11 @@
 from setuptools import find_packages, setup
 
 setup(
-    name='manifold_ot',
+    name='lagrangian_ot',
     version='0.0.1',
-    description="manifold_ot",
+    description="lagrangian_ot",
     platforms=['any'],
-    url="https://github.com/facebookresearch/manifold_ot",
+    url="https://github.com/facebookresearch/lagrangian-ot",
     packages=find_packages(),
     install_requires=[]
 )
