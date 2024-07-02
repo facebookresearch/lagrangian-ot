@@ -24,7 +24,7 @@ import dataclasses
 from typing import Iterator
 
 from ott.geometry import pointcloud
-from ott.solvers.linear import sinkhorn
+from ott.solvers.linear import solve as sinkhorn_solve
 
 import hydra
 
@@ -342,7 +342,7 @@ class Workspace:
     @functools.partial(jax.jit, static_argnums=(0,))
     def sinkhorn_cost_ott(self, x, y):
         geom = pointcloud.PointCloud(x, y, epsilon=1e-3)
-        ot = sinkhorn.solve(geom, a=None, b=None)
+        ot = sinkhorn_solve(geom, a=None, b=None)
         return ot.reg_ot_cost
 
     def sinkhorn_cost_geomloss(self, x, y):
