@@ -13,7 +13,6 @@ from flax.training import train_state
 from jax.nn import initializers
 
 from ott.math import matrix_square_root
-from ott.solvers.nn import layers
 
 PotentialValueFn_t = Callable[[jnp.ndarray], jnp.ndarray]
 PotentialGradientFn_t = Callable[[jnp.ndarray], jnp.ndarray]
