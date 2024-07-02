@@ -358,7 +358,7 @@ class GaussianMixture:
 
     name: str
     batch_size: int
-    init_rng: jax.random.PRNGKeyArray
+    init_rng: jax.random.PRNGKey(0)
     scale: float = 5.0
     variance: float = 0.5
 
