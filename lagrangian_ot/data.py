@@ -7,6 +7,7 @@ import jax.numpy as jnp
 import numpy as np
 import torch as th
 
+import requests
 
 import dataclasses
 from typing import Iterator
@@ -38,20 +39,6 @@ def get_bounds(name):
     elif name == "scarvelis_xpath":
         bounds = (-1.5, 1.5)
         xbounds = ybounds = bounds
-    elif name == "snow_goose":
-        xbounds = (0, 12)
-        ybounds = (0, 12)
-        bounds = (
-            jnp.array((xbounds[0], ybounds[0])),
-            jnp.array((xbounds[1], ybounds[1])),
-        )
-    elif name == "scrna_2d":
-        xbounds = (-15, 16)
-        ybounds = (-10, 15)
-        bounds = (
-            jnp.array((xbounds[0], ybounds[0])),
-            jnp.array((xbounds[1], ybounds[1])),
-        )
     elif name == "gsb_gmm":
         xbounds = ybounds = bounds = (-20, 20)
     else:
@@ -135,116 +122,29 @@ def get_samplers_scarvelis(geometry_str):
         "scarvelis_circle": "data_gic_24_gaussians_radius_1_std_0p1_100_samples_closed.pt",
         "scarvelis_vee": "data_mass_split_std_1_100_samples_8_intermediate_scale_x10.pt",
         "scarvelis_xpath": "data_xpath_std_0p1_100_samples_8_intermediate.pt",
-        "snow_goose": "ebird_snow_goose_data_basemap.npy",
-        "scrna_2d": "schiebinger.npz",
     }
     if geometry_str not in paths:
         raise ValueError(f"Invalid geometry choice: {geometry_str}")
 
-    if "snow_goose" in geometry_str:
-        fname = SCRIPT_PATH + "/../scarvelis_data/" + paths[geometry_str]
-        dataset = np.load(fname)
-        dataset = jnp.asarray(dataset[0:6])
+    fname = SCRIPT_PATH + "/../scarvelis_data/" + paths[geometry_str]
+    if not os.path.exists(fname):
+        os.makedirs(SCRIPT_PATH + "/../scarvelis_data/", exist_ok=True)
+        print(f"=== File {fname} does not exist. Trying to download from https://github.com/cscarv/riemannian-metric-learning-ot")
+        url = 'https://github.com/cscarv/riemannian-metric-learning-ot/raw/master/data/synthetic/' + paths[geometry_str]
+        r = requests.get(url, allow_redirects=True)
+        with open(fname, 'wb') as f:
+            f.write(r.content)
 
-        samplers = [
-            iter(sampler_from_data(dataset[t])) for t in range(dataset.shape[0])
-        ]
-        return samplers
-    elif "scrna_2d" in geometry_str:
-        url = "https://drive.google.com/file/d/1VC9i5gvZAxCE-RkydXHdanXohY6OGO5P/view?usp=sharing"
-        output = "../scarvelis_data/schiebinger.npz"
-        fname = SCRIPT_PATH + "/../scarvelis_data/" + paths[geometry_str]
-        if not os.path.exists(fname):
-            gdown.download(url, output, quiet=False, fuzzy=True)
-        ### pre-processing as in Scarvelis and Solomon (2023)
-        datadict = np.load(fname)
-        data_2d = (datadict["original_embedding"]) * 1e-3
-        timestamps = datadict["sample_labels"]
-        times = jnp.unique(timestamps)
-        subsampled_data_list = []
-        data_list = []
-        # Generate training data by randomly selecting 500 observations per time point
-        for t in list(times):
-            data_t = data_2d[timestamps == t]
-            data_list.append(data_t)
-            np.random.shuffle(data_t)  # shuffle rows of data_t
-            subsampled_data_t = data_t[:500]  # keep only first 500 samples
-            subsampled_data_list.append(subsampled_data_t)
-        subsampled_data = jnp.asarray(subsampled_data_list)
-        samplers = [
-            iter(sampler_from_data(subsampled_data[t]))
-            for t in range(subsampled_data.shape[0])
-        ]
-        return samplers
-    else:
-        fname = SCRIPT_PATH + "/../scarvelis_data/" + paths[geometry_str]
-        dataset = th.load(fname, map_location="cpu").detach()
-        dataset = jnp.asarray(dataset)
-        if geometry_str == "scarvelis_xpath":
-            assert dataset.shape[0] == 2
-            dataset = jnp.concatenate((dataset[0], dataset[1]), axis=1)
+    dataset = th.load(fname, map_location="cpu").detach()
+    dataset = jnp.asarray(dataset)
+    if geometry_str == "scarvelis_xpath":
+        assert dataset.shape[0] == 2
+        dataset = jnp.concatenate((dataset[0], dataset[1]), axis=1)
 
-        samplers = [
-            iter(sampler_from_data(dataset[t])) for t in range(dataset.shape[0])
-        ]
-        return samplers
-
-
-def get_samplers_dna(geometry_str, leave_out, batchsize, dim=5, whiten=True):
-    paths = {
-        "embrio": "ebdata_v3.h5ad",
-        "cite": "op_cite_inputs_0.h5ad",
-        "multi": "op_train_multi_targets_0.h5ad",
-    }
-    if geometry_str not in paths:
-        raise ValueError(f"Invalid geometry choice: {geometry_str}")
-
-    if geometry_str == "embrio":
-        adata = sc.read_h5ad(
-            SCRIPT_PATH + "/../single_cell_data/datasets/ebdata_v3.h5ad"
-        )
-        adata.obs["day"] = adata.obs["sample_labels"].cat.codes
-    elif geometry_str == "cite":
-        adata = sc.read_h5ad(
-            SCRIPT_PATH + "/../single_cell_data/datasets/op_cite_inputs_0.h5ad"
-        )
-    elif geometry_str == "multi":
-        adata = sc.read_h5ad(
-            SCRIPT_PATH + "/../single_cell_data/datasets/op_train_multi_targets_0.h5ad"
-        )
-    else:
-        NotImplementedError(f"name: {geometry_str} is not implemented")
-    times = adata.obs["day"].unique()
-    coords = adata.obsm["X_pca"][:, :dim]
-    if whiten:
-        mu = coords.mean(axis=0, keepdims=True)
-        sigma = coords.std(axis=0, keepdims=True)
-        coords = (coords - mu) / sigma
-        inv_scaler = lambda _x: _x
-    else:
-        mu = coords.mean(axis=0, keepdims=True)
-        sigma = np.max(coords.std(axis=0, keepdims=True))
-        coords = (coords - mu) / sigma
-        inv_scaler = lambda _x: _x * sigma + mu
-    adata.obsm["X_pca_standardized"] = coords
-    X = [adata.obsm["X_pca_standardized"][adata.obs["day"] == t] for t in times]
-    ####leave_out \in \{1,2,3\} out of [0,1,2,3,4]
-    Xtrain = []
-    Xval = []
-    for k in range(leave_out + 1):
-        if k == leave_out:
-            Xtrain.append(X[k + 1])
-            sampler_test = iter(sampler_from_data(X[k], batch_size=batchsize))
-        else:
-            Xtrain.append(X[k])
-
-    times = np.linspace(0.0, 1.0, len(Xtrain)).tolist()
-    samplers_train = [
-        iter(sampler_from_data(Xtrain[t], batch_size=batchsize))
-        for t in range(len(Xtrain))
+    samplers = [
+        iter(sampler_from_data(dataset[t])) for t in range(dataset.shape[0])
     ]
-
-    return samplers_train, sampler_test, inv_scaler, times
+    return samplers
 
 
 @dataclasses.dataclass

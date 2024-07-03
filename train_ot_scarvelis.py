@@ -48,8 +48,8 @@ class Workspace:
                 raise ValueError(
                     'data must be specified for euclidean and neural geometries')
 
-        self.has_reference_geometry = self.cfg.data in ['scarvelis_circle', 'scarvelis_vee', 'scarvelis_xpath']
-        if 'neural' in self.cfg.geometry and self.has_reference_geometry:
+        self.has_reference_geometry = 'neural' in self.cfg.geometry
+        if self.has_reference_geometry:
             self.reference_geometry = geometries.get(
                 self.cfg.data, self.cfg.geometry_kwargs)
 
@@ -370,19 +370,6 @@ class Workspace:
         fig.savefig(fname, bbox_inches='tight', pad_inches=0)
         plt.close(fig)
 
-    def _add_map(self, ax):
-        # llcrnrlat, urcrnrlat = 22, 75
-        # llcrnrlon, urcrnrlon = -172, -90
-        llcrnrlat, urcrnrlat = 22, 90
-        llcrnrlon, urcrnrlon = -172, -30
-
-        from mpl_toolkits.basemap import Basemap
-        m = Basemap(projection='merc',llcrnrlat=llcrnrlat, urcrnrlat=urcrnrlat,
-                    llcrnrlon=llcrnrlon,urcrnrlon=urcrnrlon,
-                    suppress_ticks=False, rsphere=5, resolution='l')
-
-        m.drawcoastlines(ax=ax, color='gray')
-
     def _setup_ax(self, axs):
         if not isinstance(axs, np.ndarray):
             axs = np.array([axs])
@@ -396,9 +383,6 @@ class Workspace:
             ax.set_xlim(xlims)
             ax.set_ylim(ylims)
             # ax.set_aspect('equal')
-
-            if self.cfg.data == 'snow_goose':
-                self._add_map(ax)
 
         self.geometry.add_plot_background(
             self.params_geometry, axs, xlims=xlims, ylims=ylims)

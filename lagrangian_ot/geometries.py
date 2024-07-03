@@ -37,7 +37,7 @@ def get(name, geometry_kwargs):
         return SqEuclidean()
     elif name == "gmm":
         return SqEuclidean(bounds=(-20, 20))
-    elif name in ["sq_euclidean_manifold", "snow_goose", "scrna_2d"]:
+    elif name == "sq_euclidean_manifold":
         return MetricManifold(
             distance_mode=DistanceModes.SQUARED_GEODESIC,
             metric_initializer_fn=metrics.EuclideanMetric,
