@@ -1,9 +1,9 @@
-# [Neural Optimal Transport with Lagrangian Costs](https://openreview.net/forum?id=myb0FKB8C9).
+# [Neural Optimal Transport with Lagrangian Costs](https://arxiv.org/abs/2406.00288)
 
-[Aram-Alexandre Pooladian](https://arampooladian.com/),
+UAI 2024. [Aram-Alexandre Pooladian](https://arampooladian.com/),
 [Carles Domingo-Enrich](https://cdenrich.github.io/),
 [Ricky T. Q. Chen](https://rtqichen.github.io/), and
-[Brandon Amos](https://bamos.github.io/)
+[Brandon Amos](https://bamos.github.io/).
 
 > We investigate the optimal transport problem between probability measures when the underlying cost function is understood to satisfy a least action principle, also known as a Lagrangian cost. These generalizations are useful when connecting observations from a physical system where the transport dynamics are influenced by the geometry of the system, such as obstacles (e.g., incorporating barrier functions in the Lagrangian), and allows practitioners to incorporate a priori knowledge of the underlying system such as non-Euclidean geometries (e.g., paths must be circular). Our contributions are of computational interest, where we demonstrate the ability to efficiently compute geodesics and amortize spline-based paths, which has not been done before, even in low dimensional problems. Unlike prior work, we also output the resulting Lagrangian optimal transport map without requiring an ODE solver. We demonstrate the effectiveness of our formulation on low-dimensional examples taken from prior work.
 
@@ -53,6 +53,15 @@ pip install -r requirements.txt
 ./train_ot.py geometry=lsb_well
 ```
 
+Multiple seeds can be run using Hydra's multirun mode.
+This requires setting a launcher in the Hydra
+config `train_ot.yaml`,
+which isn't set by default in this repo (I use the `sumitit_slurm` launcher).
+
+```
+./train_ot.py -m geometry=lsb_box,lsb_slit,lsb_hill,lsb_well seed=0,1,2
+```
+
 ## Metric learning with NLOT
 ![](https://private-user-images.githubusercontent.com/707462/345491132-8cda8217-efa1-41b4-9b1a-810ebb60c1f4.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MjAwMjA4ODIsIm5iZiI6MTcyMDAyMDU4MiwicGF0aCI6Ii83MDc0NjIvMzQ1NDkxMTMyLThjZGE4MjE3LWVmYTEtNDFiNC05YjFhLTgxMGViYjYwYzFmNC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwNzAzJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDcwM1QxNTI5NDJaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT03OWJjZDI0YWI1MzJmZjkzODcyYjY3OWQ0YmU5MjkxNzk4MDM3Njc2ZGI5MjU0MmUwOGQ0ZTYxM2Y0NzEzNjVmJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.QZWHtemXmt5APf-4vWHuExw75u4BEP4AjFCnwtpKfT0)
 
@@ -61,8 +70,17 @@ pip install -r requirements.txt
 
 ```
 ./train_ot_scarvelis.py geometry=scarvelis_circle
-./train_ot_scarvelis.py geometry=scarvelis_xpath
 ./train_ot_scarvelis.py geometry=scarvelis_vee
+./train_ot_scarvelis.py geometry=scarvelis_xpath
+```
+
+Multiple seeds can be run using Hydra's multirun mode.
+This requires setting a launcher in the Hydra
+config `train_ot_scarvelis.yaml`,
+which isn't set by default in this repo (I use the `sumitit_slurm` launcher).
+
+```
+./train_ot_scarvelis.py -m geometry=scarvelis_circle,scarvelis_vee,scarvelis_xpath seed=0,1,2
 ```
 
 ### Figures 3 and 4
