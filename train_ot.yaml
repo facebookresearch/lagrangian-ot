@@ -1,6 +1,5 @@
 defaults:
   - _self_
-  - override hydra/launcher: submitit_slurm
 
 seed: 0
 num_train_iters: 10001
@@ -33,8 +32,6 @@ target_potential_opt:
   init_lr: 5e-5
   alpha: 1e-4
   grad_clip: 5.
-  # b1: 0.5
-  # b2: 0.5
   b1: 0.9
   b2: 0.999
 
@@ -70,12 +67,3 @@ hydra:
   sweep:
     dir: ./exp/${now:%Y.%m.%d}/${now:%H%M}
     subdir: ${hydra.job.num}
-  launcher:
-    max_num_timeout: 100000
-    timeout_min: 4319
-    # partition: scavenge
-    partition: learnlab
-    # partition: devlab
-    mem_gb: 32
-    cpus_per_task: 20
-    gpus_per_node: 1

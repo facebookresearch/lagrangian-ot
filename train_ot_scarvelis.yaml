@@ -1,6 +1,5 @@
 defaults:
   - _self_
-  - override hydra/launcher: submitit_slurm
 
 seed: 0
 num_train_iters: 3001
@@ -16,8 +15,7 @@ metric:
   update_repeat: 1
   lr: 5e-3
 
-# neural_net_metric, scarvelis_circle, scarvelis_xpath,
-# scarvelis_vee, scarvelis_snowgoose, _scrna2d_k
+# neural_net_metric, scarvelis_circle, scarvelis_xpath, scarvelis_vee
 geometry: 'scarvelis_xpath'
 data: 'scarvelis_xpath'
 
@@ -56,12 +54,3 @@ hydra:
   sweep:
     dir: ./exp/${now:%Y.%m.%d}/${now:%H%M}
     subdir: ${hydra.job.num}
-  launcher:
-    max_num_timeout: 100000
-    timeout_min: 4319
-    # partition: scavenge
-    # partition: devlab
-    partition: learnlab
-    mem_gb: 32
-    cpus_per_task: 20
-    gpus_per_node: 1
