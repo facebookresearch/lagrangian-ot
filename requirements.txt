@@ -16,5 +16,5 @@ ott_jax==0.4.6
 pytest==7.3.0
 scipy==1.12.0
 scanpy==1.10.2
-setuptools==68.2.2
+setuptools==78.1.1
 stochman==0.3.0
